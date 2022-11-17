@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react";
+import { useDispatch } from 'react-redux'
+import { add, TodoStatus } from '../context/features/todo/todoSlice';
 
 function Calendar() {
+  //Redux
+  const dispatch = useDispatch()
+
   const currDate = new Date();
   const [currMonth, setCurrMonth] = useState(currDate.getMonth());
   const [currYear, setCurrYear] = useState(currDate.getFullYear());
@@ -45,6 +50,12 @@ function Calendar() {
     }
   }
   const nextYear = () => {
+    dispatch(add({
+      name: 'Go to work',
+      startDate: new Date(),
+      duration: 8,
+      status: TodoStatus.Complete
+    }));
     setCurrYear(currYear + 1);
   }
   const prevYear = () => {
@@ -85,7 +96,7 @@ function Calendar() {
     });
 
     return () => {
-      monthListRef.current!.innerHTML = '';
+      //monthListRef.current!.innerHTML = '';
     }
   }, []);
 

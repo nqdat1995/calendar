@@ -1,12 +1,20 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { Provider } from 'react-redux'
 import App from './App'
-import Calendar from './module/Calendar'
+import Calendar from './components/Calendar'
+import JobTable from './components/JobTable'
+import { store } from './context/store'
+import TodoProvider from './context/TodoContext'
 //import './index.css'
 import './style.css'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
+  // <React.StrictMode>
+  <Provider store={store
+  }>
     <Calendar />
-  </React.StrictMode>
+    <JobTable />
+  </Provider>
+  // </React.StrictMode>
 )
