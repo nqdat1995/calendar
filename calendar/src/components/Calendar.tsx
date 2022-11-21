@@ -1,19 +1,24 @@
 import { useEffect, useRef, useState } from "react";
-import { useDispatch } from 'react-redux'
-import { add, TodoStatus } from '../context/features/todo/todoSlice';
+import { useDispatch, useSelector } from 'react-redux'
+//import { add, TodoStatus } from '../context/features/todo/todoSlice';
+import { Todo } from "../dto/Todo.dto";
+import { RootState } from "../context/store";
+import {updateDate, updateMonth, updateYear} from "../context/features/calendar/calendarSlice"
 
 function Calendar() {
   //Redux
   const dispatch = useDispatch()
 
   const currDate = new Date();
-  const [currMonth, setCurrMonth] = useState(currDate.getMonth());
-  const [currYear, setCurrYear] = useState(currDate.getFullYear());
+  //const [currMonth, setCurrMonth] = useState(currDate.getMonth());
+  //const [currYear, setCurrYear] = useState(currDate.getFullYear());
+  const calendar = useSelector((state: RootState) => state.calendar);
   const calendarDaysRef = useRef<HTMLDivElement>(null);
   const calendarYearRef = useRef<HTMLDivElement>(null);
   const monthPickerRef = useRef<HTMLDivElement>(null);
   const monthListRef = useRef<HTMLDivElement>(null);
-  const month_names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+  const month_names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const [todos, setTodos] = useState<Todo[]>([])
 
   const isLeapYear = (year: number) => {
     return (year % 4 === 0 && year % 100 !== 0 && year % 400 !== 0) || (year % 100 === 0 && year % 400 === 0)
@@ -25,8 +30,8 @@ function Calendar() {
     let days_of_month = [31, getFebDays(year), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
     calendarDaysRef.current!.innerHTML = "";
 
-    if (month > 11 || month < 0) month = currDate.getMonth();
-    if (!year) year = currDate.getFullYear();
+    //if (month > 11 || month < 0) month = currDate.getMonth();
+    //if (!year) year = currDate.getFullYear();
 
     let curr_month = `${month_names[month]}`
     console.log(curr_month);
@@ -42,7 +47,8 @@ function Calendar() {
                             <span></span>
                             <span></span>
                             <span></span>`
-        if (i - first_day.getDay() + 1 === currDate.getDate() && year === currDate.getFullYear() && month === currDate.getMonth()) {
+        //if (i - first_day.getDay() + 1 === currDate.getDate() && year === currDate.getFullYear() && month === currDate.getMonth()) {
+        if (i - first_day.getDay() + 1 === calendar.currDate && currDate.getFullYear() === calendar.currYear && currDate.getMonth() === calendar.currMonth) {
           day.classList.add('curr-date')
         }
       }
@@ -50,33 +56,49 @@ function Calendar() {
     }
   }
   const nextYear = () => {
-    dispatch(add({
-      name: 'Go to work',
-      startDate: new Date(),
-      duration: 8,
-      status: TodoStatus.Complete
-    }));
-    setCurrYear(currYear + 1);
+    // dispatch(add({
+    //   name: 'Go to work',
+    //   startDate: new Date(),
+    //   duration: 8,
+    //   status: TodoStatus.Complete
+    // }));
+    //setCurrYear(currYear + 1);
+    dispatch(updateYear(calendar.currYear + 1));
   }
   const prevYear = () => {
-    setCurrYear(currYear - 1);
+    //setCurrYear(currYear - 1);
+    dispatch(updateYear(calendar.currYear - 1));
   }
   const prevMonth = () => {
-    if (currMonth === 0) {
-      setCurrMonth(11);
-      setCurrYear(currYear - 1)
+    // if (currMonth === 0) {
+    //   setCurrMonth(11);
+    //   setCurrYear(currYear - 1)
+    // }
+    // else {
+    //   setCurrMonth(currMonth - 1);
+    // }
+    if (calendar.currMonth === 0) {
+      dispatch(updateMonth(11));
+      dispatch(updateYear(calendar.currYear - 1));
     }
     else {
-      setCurrMonth(currMonth - 1);
+      dispatch(updateMonth(calendar.currMonth - 1));
     }
   }
   const nextMonth = () => {
-    if (currMonth === 11) {
-      setCurrMonth(0);
-      setCurrYear(currYear + 1)
+    // if (currMonth === 11) {
+    //   setCurrMonth(0);
+    //   setCurrYear(currYear + 1)
+    // }
+    // else {
+    //   setCurrMonth(currMonth + 1);
+    // }
+    if (calendar.currMonth === 11) {
+      dispatch(updateMonth(0));
+      dispatch(updateYear(calendar.currYear + 1));
     }
     else {
-      setCurrMonth(currMonth + 1);
+      dispatch(updateMonth(calendar.currMonth + 1));
     }
   }
   const showMonths = () => {
@@ -90,7 +112,8 @@ function Calendar() {
       month.innerHTML = `<div data-month="${index}">${e}</div>`
       month.querySelector('div')!.onclick = () => {
         monthListRef.current?.classList.remove('show');
-        setCurrMonth(index);
+        //setCurrMonth(index);
+        dispatch(updateMonth(index));
       }
       monthListRef.current?.appendChild(month)
     });
@@ -101,8 +124,8 @@ function Calendar() {
   }, []);
 
   useEffect(() => {
-    generateCalendar(currMonth, currYear);
-  }, [currMonth, currYear])
+    generateCalendar(calendar.currMonth, calendar.currYear);
+  }, [calendar.currMonth, calendar.currYear])
 
   return (
     <div className="calendar">
@@ -118,7 +141,7 @@ function Calendar() {
           <span className="year-change" id="prev-year" onClick={prevYear}>
             <pre>{'<'}</pre>
           </span>
-          <span id="year" ref={calendarYearRef}>{currYear}</span>
+          <span id="year" ref={calendarYearRef}>{calendar.currYear}</span>
           <span className="year-change" id="next-year" onClick={nextYear}>
             <pre>{'>'}</pre>
           </span>

@@ -2,8 +2,10 @@ import * as React from 'react';
 import { TodoContextType, ITodo } from './@types.todo';
 
 export const TodoContext = React.createContext<TodoContextType | null>(null);
-
-const TodoProvider = ({ children }) => {
+export type Props = {
+  children?: React.ReactNode
+}
+const TodoProvider: React.FC<Props> = ({ children }) => {
   const [todos, setTodos] = React.useState<ITodo[]>([
     {
       id: 1,
